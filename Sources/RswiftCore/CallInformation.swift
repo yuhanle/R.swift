@@ -23,6 +23,7 @@ public struct CallInformation {
   let targetName: String
   let bundleIdentifier: String
   let productModuleName: String
+  let resourceBundleName: String
 
   let scriptInputFiles: [String]
   let scriptOutputFiles: [String]
@@ -47,6 +48,7 @@ public struct CallInformation {
     targetName: String,
     bundleIdentifier: String,
     productModuleName: String,
+    resourceBundleName: String,
 
     scriptInputFiles: [String],
     scriptOutputFiles: [String],
@@ -70,6 +72,7 @@ public struct CallInformation {
     self.targetName = targetName
     self.bundleIdentifier = bundleIdentifier
     self.productModuleName = productModuleName
+    self.resourceBundleName = resourceBundleName
 
     self.scriptInputFiles = scriptInputFiles
     self.scriptOutputFiles = scriptOutputFiles
