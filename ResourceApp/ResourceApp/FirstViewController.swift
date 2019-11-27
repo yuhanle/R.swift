@@ -9,8 +9,19 @@
 import UIKit
 
 class FirstViewController: UIViewController {
+  var initialTitle: String
 
   @IBOutlet weak var titleLabel: UILabel!
+
+  init?(coder: NSCoder, initialTitle: String) {
+    self.initialTitle = initialTitle
+    super.init(coder: coder)
+  }
+
+  required init?(coder: NSCoder) {
+    self.initialTitle = "Created by Storyboard"
+    super.init(coder: coder)
+  }
 
   override func viewDidLoad() {
     super.viewDidLoad()

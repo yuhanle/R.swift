@@ -30,6 +30,10 @@ extension Sequence {
     return Dictionary(grouping: self, by: keyForValue)
   }
 
+  func sorted<U: Comparable>(by comparableForValue: (Element) -> U) -> [Iterator.Element] {
+    return self.sorted { comparableForValue($0) < comparableForValue($1) }
+  }
+
   func all(where predicate: (Element) throws -> Bool) rethrows -> Bool {
     return !(try contains(where: { !(try predicate($0)) }))
   }

@@ -7,7 +7,7 @@ abstract_target 'Shared' do
   inhibit_all_warnings!
 
   pod 'R.swift.Library', :git => 'https://github.com/mac-cain13/R.swift.Library.git' # for CI builds
-  # pod 'R.swift.Library', :path => '../R.swift.Library' # for development
+#  pod 'R.swift.Library', :path => '../R.swift.Library' # for development
 
   target 'ResourceApp' do
     platform :ios, '9.0'

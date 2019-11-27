@@ -124,7 +124,7 @@ internal class NibParserDelegate: NSObject, XMLParserDelegate {
     let customClass = attributeDict["customClass"]
     let customType = customClass
       .map { SwiftIdentifier(name: $0, lowercaseStartingCharacters: false) }
-      .map { Type(module: Module(name: customModule), name: $0, optional: false) }
+      .map { Type(module: Module(name: customModule), name: $0) }
 
     return customType ?? ElementNameToTypeMapping[elementName] ?? Type._UIView
   }
@@ -139,7 +139,7 @@ internal class NibParserDelegate: NSObject, XMLParserDelegate {
     let customClass = attributeDict["customClass"]
     let customType = customClass
       .map { SwiftIdentifier(name: $0, lowercaseStartingCharacters: false) }
-      .map { Type(module: Module(name: customModule), name: $0, optional: false) }
+      .map { Type(module: Module(name: customModule), name: $0) }
 
     let type = customType ?? ElementNameToTypeMapping[elementName] ?? Type._UIView
 

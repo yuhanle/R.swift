@@ -149,7 +149,7 @@ private class StoryboardParserDelegate: NSObject, XMLParserDelegate {
       let customClass = attributeDict["customClass"]
       let customType = customClass
         .map { SwiftIdentifier(name: $0, lowercaseStartingCharacters: false) }
-        .map { Type(module: Module(name: customModule), name: $0, optional: false) }
+        .map { Type(module: Module(name: customModule), name: $0) }
 
       if let customType = customType , attributeDict["kind"] != "custom" , attributeDict["kind"] != "unwind" {
         warn("Set the segue of class \(customType) with identifier '\(attributeDict["identifier"] ?? "-no identifier-")' to type custom, using segue subclasses with other types can cause crashes on iOS 8 and lower.")
@@ -237,7 +237,7 @@ private class StoryboardParserDelegate: NSObject, XMLParserDelegate {
     let customClass = attributeDict["customClass"]
     let customType = customClass
       .map { SwiftIdentifier(name: $0, lowercaseStartingCharacters: false) }
-      .map { Type(module: Module(name: customModule), name: $0, optional: false) }
+      .map { Type(module: Module(name: customModule), name: $0) }
 
     let type = customType ?? ElementNameToTypeMapping[elementName] ?? Type._UIViewController
 
@@ -254,7 +254,7 @@ private class StoryboardParserDelegate: NSObject, XMLParserDelegate {
     let customClass = attributeDict["customClass"]
     let customType = customClass
       .map { SwiftIdentifier(name: $0, lowercaseStartingCharacters: false) }
-      .map { Type(module: Module(name: customModule), name: $0, optional: false) }
+      .map { Type(module: Module(name: customModule), name: $0) }
 
     let type = customType ?? ElementNameToTypeMapping[elementName] ?? Type._UIView
     

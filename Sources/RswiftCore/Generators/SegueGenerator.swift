@@ -121,8 +121,7 @@ struct SegueStructGenerator: ExternalOnlyStructGenerator {
       let type = Type(
         module: "Rswift",
         name: "StoryboardSegueIdentifier",
-        genericArgs: [segueWithInfo.segue.type, segueWithInfo.sourceType, segueWithInfo.destinationType],
-        optional: false
+        genericArgs: [segueWithInfo.segue.type, segueWithInfo.sourceType, segueWithInfo.destinationType]
       )
       return Let(
         comments: ["Segue identifier `\(segueWithInfo.segue.identifier)`."],

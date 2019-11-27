@@ -141,23 +141,40 @@ struct StoryboardStructGenerator: StructGenerator {
       .forEach { properties.append($0.1) }
 
     viewControllersWithResourceProperty
-      .map { arg in
+      .flatMap { arg -> [Function] in
         let (vc, resource) = arg
-        return Function(
-          availables: [],
-          comments: [],
-          accessModifier: externalAccessLevel,
-          isStatic: false,
-          name: resource.name,
-          generics: nil,
-          parameters: [
-            Function.Parameter(name: "_", type: Type._Void, defaultValue: "()")
-          ],
-          doesThrow: false,
-          returnType: vc.type.asOptional(),
-          body: "return UIKit.UIStoryboard(resource: self).instantiateViewController(withResource: \(resource.name))",
-          os: []
-        )
+        return [
+          Function(
+            availables: [],
+            comments: [],
+            accessModifier: externalAccessLevel,
+            isStatic: false,
+            name: resource.name,
+            generics: nil,
+            parameters: [
+              Function.Parameter(name: "_", type: Type._Void, defaultValue: "()")
+            ],
+            doesThrow: false,
+            returnType: vc.type.asOptional(),
+            body: "return UIKit.UIStoryboard(resource: self).instantiateViewController(withResource: \(resource.name))",
+            os: []
+          ),
+          Function(
+            availables: ["iOS 13.0, *"],
+            comments: [],
+            accessModifier: externalAccessLevel,
+            isStatic: false,
+            name: resource.name,
+            generics: nil,
+            parameters: [
+              Function.Parameter(name: "creator", type: Type._Function.withGenericArgs([Type._NSCoder, vc.type.asOptional()]).asEscaping())
+            ],
+            doesThrow: false,
+            returnType: vc.type.asOptional(),
+            body: "return UIKit.UIStoryboard(resource: self).instantiateViewController(withResource: \(resource.name), creator: creator)",
+            os: []
+          )
+        ]
       }
       .forEach { functions.append($0) }
 

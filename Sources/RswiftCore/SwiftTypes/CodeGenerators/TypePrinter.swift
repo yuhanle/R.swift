@@ -23,6 +23,17 @@ struct TypePrinter: SwiftCodeConverible, UsedTypesProvider {
     let withoutModule: String
     if type.genericArgs.isEmpty {
       withoutModule = "\(type.name)"
+    } else if type.name == Type._Function.name {
+      if let last = type.genericArgs.last {
+        let args = type.genericArgs
+          .prefix(type.genericArgs.count - 1)
+          .map { $0.description }
+          .joined(separator: ", ")
+        let funcType = "(\(args)) -> \(last.description)"
+        withoutModule = type.escaping ? "@escaping \(funcType)" : funcType
+      } else {
+        withoutModule = "()"
+      }
     } else if type.name == Type._Tuple.name {
       withoutModule = "(\(args))"
     } else if type.name == Type._Array.name {

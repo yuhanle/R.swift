@@ -18,16 +18,19 @@ struct UsedType: Hashable {
 }
 
 struct Type: UsedTypesProvider, CustomStringConvertible, Hashable {
+  static let _Tuple = Type(module: .stdLib, name: "_TUPLE_")
+  static let _Function = Type(module: .stdLib, name: "_FUNCTION_")
+
   static let _Void = Type(module: .stdLib, name: "Void")
-  static let _Any = Type(module: .stdLib, name: "Any")
+  static let _Any = Type(module: .stdLib, name: SwiftIdentifier(rawValue: "Any"))
   static let _AnyObject = Type(module: .stdLib, name: "AnyObject")
   static let _String = Type(module: .stdLib, name: "String")
   static let _Bool = Type(module: .stdLib, name: "Bool")
   static let _Array = Type(module: .stdLib, name: "Array")
-  static let _Tuple = Type(module: .stdLib, name: "_TUPLE_")
   static let _Int = Type(module: .stdLib, name: "Int")
   static let _UInt = Type(module: .stdLib, name: "UInt")
   static let _Double = Type(module: .stdLib, name: "Double")
+  static let _NSCoder = Type(module: .stdLib, name: "NSCoder")
   static let _Character = Type(module: .stdLib, name: "Character")
   static let _CStringPointer = Type(module: .stdLib, name: "UnsafePointer<unichar>")
   static let _VoidPointer = Type(module: .stdLib, name: "UnsafePointer<Void>")
@@ -68,6 +71,7 @@ struct Type: UsedTypesProvider, CustomStringConvertible, Hashable {
   let name: SwiftIdentifier
   let genericArgs: [TypeVar]
   let optional: Bool
+  var escaping: Bool = false
 
   var usedTypes: [UsedType] {
     return [UsedType(type: self)] + genericArgs.flatMap(getUsedTypes)
@@ -97,6 +101,12 @@ struct Type: UsedTypesProvider, CustomStringConvertible, Hashable {
 
   func asNonOptional() -> Type {
     return Type(module: module, name: name, genericArgs: genericArgs, optional: false)
+  }
+
+  func asEscaping() -> Type {
+    var type = self
+    type.escaping = true
+    return type
   }
 
   func withGenericArgs(_ genericArgs: [TypeVar]) -> Type {
