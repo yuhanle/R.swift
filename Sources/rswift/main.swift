@@ -47,7 +47,6 @@ struct EnvironmentKeys {
   static let target = "TARGET_NAME"
   static let tempDir = "TEMP_DIR"
   static let xcodeproj = "PROJECT_FILE_PATH"
-  static let resourceBundleName = "RESOURCE_BUNDLE_NAME"
 
   static let buildProductsDir = SourceTreeFolder.buildProductsDir.rawValue
   static let developerDir = SourceTreeFolder.developerDir.rawValue
@@ -72,20 +71,7 @@ struct CommanderOptions {
   static let accessLevel = Option("accessLevel", default: AccessLevel.internalLevel, description: "The access level [public|internal] to use for the generated R-file")
   static let rswiftIgnore = Option("rswiftignore", default: ".rswiftignore", description: "Path to pattern file that describes files that should be ignored")
   static let inputOutputFilesValidation = Flag("input-output-files-validation", default: true, flag: nil, disabledName: "disable-input-output-files-validation", disabledFlag: nil, description: "Validate input and output files configured in a build phase")
-  static let importModules = Option("import", default: "", description: "Add extra modules as import in the generated file, comma seperated.")
-  static let accessLevel = Option("accessLevel", default: AccessLevel.internalLevel, description: "The access level [public|internal] to use for the generated R-file.")
-  static let rswiftIgnore = Option("rswiftignore", default: ".rswiftignore", description: "Path to pattern file that describes files that should be ignored.")
-
-  static let xcodeproj = Option("xcodeproj", default: EnvironmentKeys.xcodeproj, flag: "p", description: "Path to the xcodeproj file.")
-  static let target = Option("target", default: EnvironmentKeys.target, flag: "t", description: "Target the R-file should be generated for.")
-
-  static let bundleIdentifier = Option("bundleIdentifier", default: EnvironmentKeys.bundleIdentifier, description: "Bundle identifier the R-file is be generated for.")
-  static let productModuleName = Option("productModuleName", default: EnvironmentKeys.productModuleName, description: "Product module name the R-file is generated for.")
-  static let resourceBundleName = Option("resourceBundleName", default: EnvironmentKeys.resourceBundleName, description: "Embedded Resource Bundle name the R-file is generated for.")
-  static let buildProductsDir = Option("buildProductsDir", default: EnvironmentKeys.buildProductsDir, description: "Build products folder that Xcode uses during build.")
-  static let developerDir = Option("developerDir", default: EnvironmentKeys.developerDir, description: "Developer folder that Xcode uses during build.")
-  static let sourceRoot = Option("sourceRoot", default: EnvironmentKeys.sourceRoot, description: "Source root folder that Xcode uses during build.")
-  static let sdkRoot = Option("sdkRoot", default: EnvironmentKeys.sdkRoot, description: "SDK root folder that Xcode uses during build.")
+  static let resourceBundleName = Option("resourceBundleName", default: "", description: "Embedded Resource Bundle name the R-file is generated for.")
 }
 
 // Options grouped in struct for readability
@@ -118,10 +104,11 @@ let generate = command(
   CommanderOptions.importModules,
   CommanderOptions.accessLevel,
   CommanderOptions.rswiftIgnore,
+  CommanderOptions.resourceBundleName,
   CommanderOptions.inputOutputFilesValidation,
 
   CommanderArguments.outputPath
-) { generatorNames, uiTestOutputPath, importModules, accessLevel, rswiftIgnore, inputOutputFilesValidation, outputPath in
+) { generatorNames, uiTestOutputPath, importModules, accessLevel, rswiftIgnore, resourceBundleName, inputOutputFilesValidation, outputPath in
 
   let processInfo = ProcessInfo()
 
@@ -133,16 +120,6 @@ let generate = command(
   } catch {
     warn("Failed to write out to '\(Rswift.lastRunFile)', this might cause Xcode to not run the R.swift build phase: \(error)")
   }
-  CommanderOptions.bundleIdentifier,
-  CommanderOptions.productModuleName,
-  CommanderOptions.resourceBundleName,
-  CommanderOptions.buildProductsDir,
-  CommanderOptions.developerDir,
-  CommanderOptions.sourceRoot,
-  CommanderOptions.sdkRoot,
-
-  CommanderArguments.outputDir
-) { importModules, accessLevel, rswiftIgnore, xcodeproj, target, bundle, productModule, resourceModule, buildProductsDir, developerDir, sourceRoot, sdkRoot, outputDir in
 
   let xcodeprojPath = try processInfo.environmentVariable(name: EnvironmentKeys.xcodeproj)
   let targetName = try processInfo.environmentVariable(name: EnvironmentKeys.target)
@@ -155,11 +132,6 @@ let generate = command(
   let sdkRootPath = try processInfo.environmentVariable(name: EnvironmentKeys.sdkRoot)
   let tempDir = try processInfo.environmentVariable(name: EnvironmentKeys.tempDir)
   let platformPath = try processInfo.environmentVariable(name: EnvironmentKeys.platformDir)
-  let xcodeprojPath = try info.value(from: xcodeproj, name: "xcodeproj", key: EnvironmentKeys.xcodeproj)
-  let targetName = try info.value(from: target, name: "target", key: EnvironmentKeys.target)
-  let bundleIdentifier = try info.value(from: bundle, name: "bundleIdentifier", key: EnvironmentKeys.bundleIdentifier)
-  let productModuleName = try info.value(from: productModule, name: "productModuleName", key: EnvironmentKeys.productModuleName)
-  let resourceBundleName = try info.value(from: resourceModule, name: "resourceBundleName", key: EnvironmentKeys.resourceBundleName, isOptional: true)
 
   let outputURL = URL(fileURLWithPath: outputPath)
   let uiTestOutputURL = uiTestOutputPath.count > 0 ? URL(fileURLWithPath: uiTestOutputPath) : nil
@@ -174,8 +146,6 @@ let generate = command(
   }
   let generators = knownGenerators.isEmpty ? RswiftGenerator.allCases : knownGenerators
 
-  let outputURL = URL(fileURLWithPath: outputDir).appendingPathComponent(Rswift.resourceFileName, isDirectory: false)
-  let rswiftIgnoreURL = URL(fileURLWithPath: sourceRootPath).appendingPathComponent(rswiftIgnore, isDirectory: false)
   let modules = importModules
     .components(separatedBy: ",")
     .map { $0.trimmingCharacters(in: CharacterSet.whitespaces) }
