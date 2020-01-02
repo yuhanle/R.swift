@@ -72,6 +72,7 @@ struct CommanderOptions {
   static let rswiftIgnore = Option("rswiftignore", default: ".rswiftignore", description: "Path to pattern file that describes files that should be ignored")
   static let inputOutputFilesValidation = Flag("input-output-files-validation", default: true, flag: nil, disabledName: "disable-input-output-files-validation", disabledFlag: nil, description: "Validate input and output files configured in a build phase")
   static let resourceBundleName = Option("resourceBundleName", default: "", description: "Embedded Resource Bundle name the R-file is generated for.")
+  static let target = Option("target", default: "", description: "Embedded Resource target name the R-file is generated for.")
 }
 
 // Options grouped in struct for readability
@@ -105,10 +106,11 @@ let generate = command(
   CommanderOptions.accessLevel,
   CommanderOptions.rswiftIgnore,
   CommanderOptions.resourceBundleName,
+  CommanderOptions.target,
   CommanderOptions.inputOutputFilesValidation,
 
   CommanderArguments.outputPath
-) { generatorNames, uiTestOutputPath, importModules, accessLevel, rswiftIgnore, resourceBundleName, inputOutputFilesValidation, outputPath in
+) { generatorNames, uiTestOutputPath, importModules, accessLevel, rswiftIgnore, resourceBundleName, target, inputOutputFilesValidation, outputPath in
 
   let processInfo = ProcessInfo()
 
@@ -122,7 +124,7 @@ let generate = command(
   }
 
   let xcodeprojPath = try processInfo.environmentVariable(name: EnvironmentKeys.xcodeproj)
-  let targetName = try processInfo.environmentVariable(name: EnvironmentKeys.target)
+  let targetName = target.isEmpty ? try processInfo.environmentVariable(name: EnvironmentKeys.target) : target
   let bundleIdentifier = try processInfo.environmentVariable(name: EnvironmentKeys.bundleIdentifier)
   let productModuleName = try processInfo.environmentVariable(name: EnvironmentKeys.productModuleName)
 
